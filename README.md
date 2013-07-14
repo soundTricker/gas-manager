@@ -3,12 +3,7 @@
 Google Apps Script Import/Export Helper for nodejs
 
 ## Getting Started
-Install the module with: `npm install gas-manager`
-
-```javascript
-var gas_manager = require('gas-manager');
-gas_manager.awesome(); // "awesome"
-```
+_(Coming soon)_
 
 ## Documentation
 _(Coming soon)_
