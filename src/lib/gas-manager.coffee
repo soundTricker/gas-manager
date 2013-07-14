@@ -39,19 +39,6 @@ class Manager
       'client_secret' : @options.client_secret,
     })
 
-  authorize:(code,options={})=>
-    credential = @loadCredentialFromCache_()
-    if credential
-      @ouath2Client.credentials = credential
-      options.callback && options.callback(null, credentials)
-
-    that = @
-    oauth2Client.getToken code, (err, tokens)->
-      if !err?
-        @ouath2Client.credentials = tokens
-        that.saveCredentialsToCache_ tokens
-      options.callback && options.callback(err, tokens)
-
   get:(fileId, callback, errCallback)=>
 
     errCallback = errCallback || (err, results) -> console.log("error")
