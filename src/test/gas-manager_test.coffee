@@ -59,75 +59,143 @@ Should assertions:
 
 describe 'gas-manager', ()->
 
+
+
   it "should have Manager property ",()->
     gas_manager.should.have.property('Manager')
+    @
 
   describe '.Manager class', ()->
 
     Manager = null
-    manager = null
+    scriptManager = null
 
-    beforeEach ()->
+    before ()->
       Manager = gas_manager.Manager
+      @
 
     it 'should be a function', ()->
       Manager.should.be.a('function')
+      @
 
     describe '.constructor',()->
 
       options = null
 
-      beforeEach ()->
+      before ()->
         options = JSON.parse fs.readFileSync "./tmp/test.json"
-        manager = new Manager options
- 
+        scriptManager = new Manager options
+        @
+
       it 'should be a constructor', ()->
-        manager.should.be.a('object')
+        scriptManager.should.be.a('object')
+        @
 
       it 'should be throw error, if does not set options' , ()->
         (()-> new Manager).should.throwError("should set options")
+        @
 
       it 'should have tokenProvider propety ',()->
-        manager.should.have.property('tokenProvider')
+        scriptManager.should.have.property('tokenProvider')
+        @
 
       it 'should have option', ()->
-        manager.should.have.property('options' , options)
+        scriptManager.should.have.property('options' , options)
+        @
 
-    describe '.get', ()->
+    describe '.getProject', ()->
 
-      beforeEach ()->
+      before ()->
         options = JSON.parse fs.readFileSync "./tmp/test.json"
-        manager = new Manager options
+        scriptManager = new Manager options
+        @
 
       it 'should get project', (done)->
-        manager.get(FILE_ID
-        ,(response , body)->
-          body.should.be.a('object')
-          body.should.have.property 'files'
+        scriptManager.getProject(FILE_ID
+        ,(response , project)->
+          project.should.be.a('object')
+          project.should.have.property 'origin'
           done()
         ,(err, result)-> 
-          done()
+          console.error err
+          done("error")
         )
+        @
     describe '.upload',()->
       project = null
       before (done)->
         options = JSON.parse fs.readFileSync "./tmp/test.json"
-        manager = new Manager options
-        manager.get FILE_ID, (response, body)->
-          project = body
+        scriptManager = new Manager options
+        scriptManager.getProject FILE_ID, (response, p)->
+          project = p
           done()
+        @
 
       it 'should upload project', (done)->
 
-        project.files[0].source += "//test";
+        project.getFiles()[0].source += "//test";
 
-        manager.upload(FILE_ID, project, (response , body)->
-          manager.get FILE_ID, (response, body)->
-            body.files[0].source.should.match(/\/\/test/)
-            done()
-        ,(err, response, body)->
-          if err
-            console.log body 
+        scriptManager.upload(FILE_ID, project
+          ,(response, p)->
+            scriptManager.getProject(FILE_ID, (response, p)->
+              p.getFiles()[0].source.should.match(/\/\/test/)
+              done()
+            ,(err, response, project)->
+              done("error")
+            )
+          ,(err, response, project)->
+            if err
+              console.log project
+            done("error")
+          )
+        @
+    describe '.createProject', ()->
+      project = null
+      before ()->
+        options = JSON.parse fs.readFileSync "./tmp/test.json"
+        scriptManager = new Manager options
+        project = scriptManager.createProject 'test'
+        @
+
+      it "should be GASProject", ()->
+        project.should.have.property "filename"
+        project.filename.should.eql "test"
+        @
+
+    describe '.createNewProject', ()->
+      fileId = null
+      before ()->
+        options = JSON.parse fs.readFileSync "./tmp/test.json"
+        scriptManager = new Manager options
+        @
+      it "should create new gas project",(done)->
+        scriptManager.createNewProject "test-test" , {
+          files :[
+            {
+              name : "test"
+              type : "server_js"
+              source : "function a(){ Logger.log('a');}"
+            }
+          ]
+        },
+        (response, project)->
+          project.filename.should.eql "test-test"
+          console.log project.fileId
+          fileId = project.fileId
           done()
+        ,
+        (error, response , body)->
+          console.error error
+          done("error")
+        @
+      after (done)->
+        scriptManager.deleteProject(fileId
+          ,()->
+            done()
+          ,(err , result)->
+            done("error")
         )
+        @
+
+
 
