@@ -50,6 +50,7 @@ module.exports = (grunt)->
     simplemocha:
       all:
         src: [
+          'node_modules/assert/assert.js'
           'node_modules/should/lib/should.js'
           'out/test/**/*.js'
         ]

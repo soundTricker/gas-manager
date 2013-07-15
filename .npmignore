@@ -4,9 +4,13 @@
 History.md
 grunt.coffee
 grunt.js
+Gruntfile.coffee
 
 src/
 out/demo/
 out/test/
 out/vendor/
 /tmp
+.git/
+.gitignore
+

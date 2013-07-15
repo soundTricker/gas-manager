@@ -180,7 +180,6 @@ describe 'gas-manager', ()->
         },
         (response, project)->
           project.filename.should.eql "test-test"
-          console.log project.fileId
           fileId = project.fileId
           done()
         ,

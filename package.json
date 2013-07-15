@@ -1,7 +1,7 @@
 {
   "name": "gas-manager",
   "description": "Google Apps Script Import/Export Helper for nodejs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/soundTricker/gas-manager",
   "author": {
     "name": "Keisuke Oohashi",
@@ -38,7 +38,8 @@
     "grunt-simple-mocha": "~0.4.0",
     "should": "~1.2.2",
     "grunt": "~0.4.1",
-    "open": "0.0.3"
+    "open": "0.0.3",
+    "assert": "~0.4.9"
   },
   "keywords": [],
   "dependencies": {

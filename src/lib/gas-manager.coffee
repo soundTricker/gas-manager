@@ -143,7 +143,7 @@ class Manager
           headers : {
             "content-type" :"application/vnd.google-apps.script+json"
           }
-          url : "https://www.googleapis.com/upload/drive/v2/files/#{fileId}",
+          url : "#{UPLOAD_API_ROOT}/files/#{fileId}",
           qs :{
             'access_token' : accessToken
           }
@@ -190,12 +190,12 @@ class Manager
       if @fileId
         @manager.upload(@fileId, @origin, callback, errorCallback)
       else
-        @manager.createNewProject_(@filename, @origin)
+        @manager.createNewProject(@filename, @origin, callback, errorCallback)
         
-    create:()=>
+    create:(callback, errorCallback)=>
       newProject = JSON.parse(JSON.stringify(@origin))
       delete file.id for k, file in newProject.files when file.id
-      @manager.createNewProject_(@filename, @origin)
+      @manager.createNewProject(@filename, @origin, callback, errorCallback)
           
   class GASFile
     constructor:(@manager, @origin)->
