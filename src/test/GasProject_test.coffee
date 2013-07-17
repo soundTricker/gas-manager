@@ -13,10 +13,12 @@ describe "GASProject", ()->
   describe "#constructor",()->
     project = null
     before (done)->
-      scriptManager.getProject(fileId, (res, p)->
+      scriptManager.getProject(fileId, (err, p)->
+        return done(err) if err
         project = p
         done()
       )
+      @
 
     it "should set properties, fileId, filename, manager, origin", ()->
       project.fileId.should.eql fileId
@@ -45,7 +47,8 @@ describe "GASProject", ()->
 
     describe "#addFile",()->
       beforeEach (done)->
-        scriptManager.getProject(fileId, (res, p)->
+        scriptManager.getProject(fileId, (err, p)->
+          return done(err) if err
           project = p
           done()
         )
@@ -66,7 +69,8 @@ describe "GASProject", ()->
         @
 
       after (done)->
-        scriptManager.getProject(fileId, (res, p)->
+        scriptManager.getProject(fileId, (err, p)->
+          return done(err) if err
           project = p
           done()
         )
@@ -76,7 +80,9 @@ describe "GASProject", ()->
     describe "#renameFile", ()->
       project = null
       beforeEach (done)->
-        scriptManager.getProject(fileId,(res,poroject)->
+        scriptManager.getProject(fileId,(err, p)->
+          return done(err) if err
+          project = p
           project.addFile("test-2" , "server_js", "test")
           done()
         )
@@ -97,7 +103,8 @@ describe "GASProject", ()->
     describe "#deleteFile", ()->
       project = null
       beforeEach (done)->
-        scriptManager.getProject(fileId,(res,p)->
+        scriptManager.getProject(fileId,(err, p)->
+          return done(err) if err
           project = p
           project.addFile("test" , "server_js", "test")
           done()
@@ -116,8 +123,10 @@ describe "GASProject", ()->
     describe "#deploy",()->
       project = null
       before (done)->
-        scriptManager.getProject(fileId,(res,p)->
-          p.deleteFile("test").deploy((res,p)->
+        scriptManager.getProject(fileId,(err, p)->
+          return done(err) if err
+          p.deleteFile("test").deploy((err, p, res)->
+            return done(err) if err
             project = p.addFile("test" , "server_js", "//test")
             done()
           )
@@ -126,13 +135,15 @@ describe "GASProject", ()->
 
       it "should deploy project", (done)->
         project
-        .deploy((res,newProject)->
-          scriptManager.getProject(fileId,(res, reget)->
+        .deploy((err, newProject, res)->
+          return done(err) if err
+          scriptManager.getProject(fileId,(err, reget)->
+            return done(err) if err
             should.exist reget.getFileByName("test")
             newProject.fileId.should.eql reget.fileId
-            project.deleteFile("test").deploy(
-              (res, p)->
-                done()
+            project.deleteFile("test").deploy((err, p)->
+              return done(err) if err
+              done()
             )
           )
         )
@@ -141,13 +152,14 @@ describe "GASProject", ()->
       it "should create new project, if does not have fileId", (done)->
         scriptManager.createProject("new project")
         .addFile("hoge", "server_js", "//test")
-        .deploy((res, newProject)->
-          scriptManager.getProject(newProject.fileId,(res, reget)->
+        .deploy((err, newProject, res)->
+          return done(err) if err
+          scriptManager.getProject(newProject.fileId,(err, reget)->
+            return done(err) if err
             newProject.fileId.should.eql reget.fileId
             should.exist newProject.getFileByName("hoge")
             newProject.filename.should.eql "new project"
-            scriptManager.deleteProject(
-              newProject.fileId, ()-> done())
+            scriptManager.deleteProject(newProject.fileId, ()-> done())
           )
         )
         @

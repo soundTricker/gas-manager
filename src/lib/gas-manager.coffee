@@ -32,9 +32,10 @@ class Manager
       'client_secret' : @options.client_secret,
     })
 
-  getProject : (fileId, callback, errCallback)=>
+  getProject : (fileId, callback)=>
 
-    errCallback = errCallback || (err, results) -> console.log(results,err)
+    callback = callback || (err, results)->
+      if err then console.log(err,results)
 
     if !fileId
       throw new Error 'fileId id is given'
@@ -42,7 +43,7 @@ class Manager
     async.waterfall([
       (cb)=>
           @tokenProvider.getToken(cb)
-      ,(accessToken, cb)->
+      ,(accessToken, cb)=>
         request.get({
           url : Manager.DOWNLOAD_URL + fileId,
           qs :{
@@ -50,23 +51,34 @@ class Manager
           }
         }, cb)
       ,(response, body, cb)=>
+
+        if response.statusCode != 200
+          cb(body, null,response)
+          return
+
+        bodyJson = JSON.parse(body)
+        if bodyJson.error
+          cb(bodyJson, null,response)
+          return
+
         filename = decodeURI(
           response.headers["content-disposition"]
           .split("''")[1].replace(/\.json$/,"")
         )
         project = new GASProject(filename, fileId, @, JSON.parse(body))
         cb(null
-          ,response
-          ,project)
-      ,callback
+          ,project
+          ,response)
     ]
-    ,errCallback)
+    ,callback)
 
   createProject:(projectName)->
     return new GASProject projectName , null, @, {files : []}
 
-  deleteProject:(fileId, callback, errCallback)->
-    errCallback = errCallback || (err, results) -> console.log(results,err)
+  deleteProject:(fileId, callback)->
+    callback = callback || (err, results)->
+      if err then console.log(err,results)
+
     if !fileId
       throw new Error 'fileId id is given'
     accessToken_ = null
@@ -81,12 +93,24 @@ class Manager
             'access_token' : accessToken
           }
         }, cb)
-      callback
-    ], errCallback)
+      (response, body, cb)=>
+        if response.statusCode != 200
+          cb(body, null,response)
+          return
+
+        bodyJson = JSON.parse(body)
+        if bodyJson.error
+          cb(bodyJson, bodyJson,response)
+          return
+
+        cb(null, bodyJson, response)
+    ], callback)
 
 
-  createNewProject : (filename, gasProjectJson, callback , errCallback)=>
-    errCallback = errCallback || (err, results) -> console.log(results,err)
+  createNewProject : (filename, gasProjectJson, callback)=>
+    callback = callback || (err, results)->
+      if err then console.log(err,results)
+
     accessToken_ = null
     async.waterfall([
       (cb)=>
@@ -106,7 +130,15 @@ class Manager
           }
         }, cb)
       (response, body ,cb)=>
+        if response.statusCode != 200
+          cb(body, null, response)
+          return
         result = JSON.parse(body)
+
+        if result.error
+          cb(result, null,response)
+          return
+
         fileId = result.id
         title = result.title
         if filename
@@ -116,19 +148,32 @@ class Manager
             url : "#{API_ROOT}/files/#{fileId}"
             qs :
               'access_token' : accessToken_
-          }, (res, b)->
+          }, (err, res, b)->
+            if err
+              cb(err)
+              return
+
+            if res.statusCode != 200
+              cb(b, null, res)
+              return
+            result = b
+
+            if result.error
+              cb(result, null,res)
+              return
+
             project = new GASProject(filename, fileId, @, gasProjectJson)
-            cb(null, response, project)
+            cb(null, project, res)
           )
           return
 
-        cb(null, response, new GASProject(title, fileId, @,gasProjectJson))
-      callback
-    ],errCallback)
+        cb(null, new GASProject(title, fileId, @,gasProjectJson), response)
+    ],callback)
 
-  upload:(fileId, gasProjectJson, callback , errCallback)=>
+  upload:(fileId, gasProjectJson, callback)=>
 
-    errCallback = errCallback || (err, results) -> console.log(results,err)
+    callback = callback || (err, results)->
+      if err then console.log(err,results)
 
     if !fileId
       throw new Error 'fileId id is given'
@@ -149,11 +194,19 @@ class Manager
           }
         }, cb)
       (response, body ,cb)=>
+        if response.statusCode != 200
+          cb(body, null, response)
+          return
+        result = JSON.parse(body)
+
+        if result.error
+          cb(result, null, response)
+          return
+
         {id, title} = JSON.parse(body)
-        cb(null, response, new GASProject(title, id, @, gasProjectJson))
-      callback
+        cb(null, new GASProject(title, id, @, gasProjectJson), response)
     ]
-    ,errCallback)
+    ,callback)
 
   class GASProject
     constructor:(@filename, @fileId, @manager, @origin={files:[]})->
@@ -186,16 +239,16 @@ class Manager
       @origin.files = @origin.files.filter((file)-> file.name != filename)
       return @
     
-    deploy:(callback, errorCallback)=>
+    deploy:(callback)=>
       if @fileId
-        @manager.upload(@fileId, @origin, callback, errorCallback)
+        @manager.upload(@fileId, @origin, callback)
       else
-        @manager.createNewProject(@filename, @origin, callback, errorCallback)
+        @manager.createNewProject(@filename, @origin, callback)
         
-    create:(callback, errorCallback)=>
+    create:(callback)=>
       newProject = JSON.parse(JSON.stringify(@origin))
       delete file.id for k, file in newProject.files when file.id
-      @manager.createNewProject(@filename, @origin, callback, errorCallback)
+      @manager.createNewProject(@filename, @origin, callback)
           
   class GASFile
     constructor:(@manager, @origin)->

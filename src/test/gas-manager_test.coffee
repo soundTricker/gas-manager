@@ -112,41 +112,41 @@ describe 'gas-manager', ()->
 
       it 'should get project', (done)->
         scriptManager.getProject(FILE_ID
-        ,(response , project)->
+        ,(err, project)->
+          return done(err) if err
           project.should.be.a('object')
           project.should.have.property 'origin'
           done()
-        ,(err, result)-> 
-          console.error err
-          done("error")
         )
         @
+      it 'should call error , if does not exist',(done)->
+        scriptManager.getProject("a",(err, project)->
+          return done() if err
+          done("should throw error")
+        )
     describe '.upload',()->
       project = null
       before (done)->
         options = JSON.parse fs.readFileSync "./tmp/test.json"
         scriptManager = new Manager options
-        scriptManager.getProject FILE_ID, (response, p)->
+        scriptManager.getProject FILE_ID, (err, p)->
+          return done(err) if err
           project = p
           done()
         @
 
       it 'should upload project', (done)->
+        now = new Date()
+        project.getFiles()[0].source = project.getFiles()[0].source.replace(/\/\/test/gm, "") + "//test" + now
 
-        project.getFiles()[0].source += "//test";
-
-        scriptManager.upload(FILE_ID, project
-          ,(response, p)->
-            scriptManager.getProject(FILE_ID, (response, p)->
+        scriptManager.upload(FILE_ID, project.origin
+          ,(err, p, response)->
+            return done(throw new Error(err)) if err
+            scriptManager.getProject(FILE_ID, (err, p)->
+              return done(err) if err
               p.getFiles()[0].source.should.match(/\/\/test/)
               done()
-            ,(err, response, project)->
-              done("error")
             )
-          ,(err, response, project)->
-            if err
-              console.log project
-            done("error")
           )
         @
     describe '.createProject', ()->
@@ -178,21 +178,17 @@ describe 'gas-manager', ()->
             }
           ]
         },
-        (response, project)->
+        (err, project)->
+          return done(err) if err
           project.filename.should.eql "test-test"
           fileId = project.fileId
           done()
-        ,
-        (error, response , body)->
-          console.error error
-          done("error")
         @
       after (done)->
         scriptManager.deleteProject(fileId
-          ,()->
+          ,(err)->
+            return done(err) if err
             done()
-          ,(err , result)->
-            done("error")
         )
         @
 
