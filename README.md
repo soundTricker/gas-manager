@@ -41,11 +41,11 @@ gasProject.addFile(
     'html', //it should be 'server_js' or 'html'
     '<div>Hello</div>' //source code
 ).deploy(
-  function(response, project){
+  function(err, project, response){
+    if(err) {
+      throw new Error(err)
+    }
     //callback
-  }
-  ,function(err, response){
-    //error callback, it's optional
   }
 );
 
@@ -70,13 +70,24 @@ manager.getProject('file id at google drive', function(res, gasProject){
     'server_js', //it should be 'server_js' or 'html'
     'function test(){ Logger.log("hoge");}' //source code
   )
+  //change file contents
+  .changeFile("name",
+    {
+      name : "hoge",
+      type : "html",
+      source : "huga"
+    }
+  )
+  .changeFile("name2", {source : "huga2"}) // changeFile only change setting property
   .renameFile("before filename" , "after filename")
   .deleteFile("target Filename")
-  .deploy(function(res, updatedProject){
-    console.log("success")
-  },function(err, res){
-    console.error(err, res);
-  });
+  .deploy(function(err, project, response){
+    if(err) {
+      throw new Error(err)
+    }
+    //callback
+  }
+  );
 });
 
 ```
