@@ -120,6 +120,58 @@ describe "GASProject", ()->
         (()->project.deleteFile("hoge")).should.not.throwError()
         @
       @
+    describe "#changeFile", ()->
+      project = null
+      beforeEach (done)->
+        scriptManager.getProject(fileId,(err, p)->
+          return done(err) if err
+          p.deleteFile("test").deploy((err, p, res)->
+            return done(err) if err
+            project = p.addFile("test" , "server_js", "//test")
+            done()
+          )
+        )
+        @
+
+      it "should change file", ()->
+        file = JSON.parse(JSON.stringify(project.getFileByName("test").origin))
+
+        p = project.changeFile("test" , name : "huga" , source : "//test2" , type:"html")
+
+        should.not.exist project.getFileByName("test")
+        changedFile = project.getFileByName("huga")
+        should.exist changedFile
+        changedFile.name.should.eql "huga" 
+        changedFile.type.should.eql "html" 
+        changedFile.source.should.eql "//test2" 
+        p.should.equal project
+        @
+
+      it "should change file only setting property", ()->
+        file = JSON.parse(JSON.stringify(project.getFileByName("test").origin))
+
+        project.changeFile("test" , source : "//test2")
+
+        changedFile = project.getFileByName("test")
+        should.exist changedFile
+        changedFile.name.should.eql file.name 
+        changedFile.type.should.eql file.type
+        changedFile.source.should.eql "//test2" 
+        @
+
+      it "should allow functional parameter", ()->
+        file = JSON.parse(JSON.stringify(project.getFileByName("test").origin))
+
+        project.changeFile("test" , (testFile)-> testFile.source = testFile.source + "//test2")
+
+        changedFile = project.getFileByName("test")
+        should.exist changedFile
+        changedFile.name.should.eql file.name 
+        changedFile.type.should.eql file.type
+        changedFile.source.should.eql file.source + "//test2" 
+        @
+
+
     describe "#deploy",()->
       project = null
       before (done)->

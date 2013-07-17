@@ -221,8 +221,31 @@ class Manager
         return new GASFile(@manager, filtered[0])
       else
         return null
-    
+
+    changeFile:(name , updated={}, addIfNone=true)=>
+
+      throw new Error("name is given") if !name
+
+      file = @getFileByName(name)
+      if addIfNone && !file
+        file = new GASFile(@manager, name : name , type : "server_js", source : "")
+
+      throw new Error("does not exist file #{name}") if !file
+
+      if typeof updated == 'function'
+        updated(file)
+        return @
+
+      file.name = updated.name || file.name
+      file.type = updated.type || file.type
+      file.source = updated.source || file.source
+
+      return @
+
     addFile:(name, type, source)=>
+
+      throw new Error("exist same name file") if @getFileByName(name)?
+
       @origin.files.push(
         name : name
         type : type

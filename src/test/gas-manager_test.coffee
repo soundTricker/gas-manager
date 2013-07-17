@@ -137,7 +137,7 @@ describe 'gas-manager', ()->
 
       it 'should upload project', (done)->
         now = new Date()
-        project.getFiles()[0].source = project.getFiles()[0].source.replace(/\/\/test/gm, "") + "//test" + now
+        project.getFiles()[0].source = project.getFiles()[0].source + "\n//test" + now
 
         scriptManager.upload(FILE_ID, project.origin
           ,(err, p, response)->
