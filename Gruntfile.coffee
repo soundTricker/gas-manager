@@ -71,6 +71,9 @@ module.exports = (grunt)->
       jsTest:
         files: '<%= jshint.test.src %>'
         tasks: ['jshint:test', 'simplemocha']
+      coffee:
+        files: '<%= coffeelint.lib.src %>'
+        tasks: ['coffeelint:lib','coffee:lib']
       cofffeLib:
         files: '<%= coffeelint.lib.src %>'
         tasks: ['coffeelint:lib','coffee:lib', 'simplemocha']
