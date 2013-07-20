@@ -18,6 +18,12 @@ then you may install this plugin with this command:
 npm install gas-manager --save
 ```
 
+if you need gas-manager cli, please run below command:
+
+```shell
+npm install -g gas-manager
+```
+
 ## CLI
 gas-manager support Command Line Interface.
 
