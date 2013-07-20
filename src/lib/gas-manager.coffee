@@ -228,7 +228,13 @@ class Manager
 
       file = @getFileByName(name)
       if addIfNone && !file
-        file = new GASFile(@manager, name : name , type : "server_js", source : "")
+        file = new GASFile(
+          @manager
+          ,{
+            name : name
+            type : "server_js"
+            source : ""
+          })
 
       throw new Error("does not exist file #{name}") if !file
 
