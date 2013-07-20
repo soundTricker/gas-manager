@@ -18,7 +18,122 @@ then you may install this plugin with this command:
 npm install gas-manager --save
 ```
 
-## Examples
+## CLI
+gas-manager support Command Line Interface.
+
+### Prepare config file.
+In order to use CLI of gas-manager, it will be necessary to create config file.  
+The config file default path is `./gas-config.json`.  
+If you need change that, please add `-c /path/to/configfile` option when running command.  
+
+config file should be like below.
+
+>***Caution!*** config file inculde refresh_token, it should not publish.
+
+```json
+{
+  "client_id": "your client_id , getting from Googe API Console",
+  "client_secret": "your client_secret , getting from Googe API Console",
+  "refresh_token":"your refresh_token, please see the adove link",
+  "enviroment name": {
+    "fileId" : "target Google Drive's fileId of google apps script project",
+    "files" : {
+      "filename on GAS Project, it should not include extension like .gs" : {
+        "path" : "path/to/yourlocalfile.js",
+        "type" : "file type, server_js or html"
+      }
+    }
+  },
+  "src" : {
+    "code": {
+      "path" : "src/main/code.js",
+      "type" : "server_js"
+    },
+    "index.html" : {
+      "path" : "src/main/view/index.html",
+      "type" : "html"
+    },
+    "classes": {
+      "path" : "src/main/api/classes.js",
+      "type" : "server_js"
+    }
+  },
+  "test" : {
+    "codeSpec": {
+      "path" : "src/main/codeSpec.js",
+      "type" : "server_js"
+    },
+    "classesSpec": {
+      "path" : "src/main/api/classesSpec.js",
+      "type" : "server_js"
+    }
+  }
+}
+```
+
+### Commands
+
+#### Show help
+    $ gas --help
+
+### Download Command
+>The `download` command is downloading GAS Project to your local.
+
+#### Show help of `download` command
+
+    $ gas download --help
+
+#### Download GAS Project to local.
+
+    $ gas download -p src/main/
+
+>***Caution!*** `gas download` command always override local sources.  
+>*Note* `-p` option is default save path for downloading sources. if gas filename is not set in config, this path is used.
+
+
+#### Change config file path
+
+    $ gas download -p src/main/ -c path/to/configfile.json
+
+>*Note* the default config file path is `./gas-config.json`.
+
+#### Change the enviroment
+
+    $ gas download -p src/main/ -c path/to/configfile.json -e test
+
+>*Note* the default enviroment is `src`.
+
+### Upload Command
+
+>The `upload` command is uploading your local files to Google Drive's GAS Project.
+
+#### Show help of `upload` command
+
+    $ gas upload --help
+
+#### Upload your local files to to Google Drive's GAS Project
+
+    $ gas upload
+
+>*Note* The `upload` command upload files written in config file. if file is not exist in config file, it is not uploaded.  
+
+#### Upload your local files and delete GAS Project file, that does not exist in config file.
+
+    $ gas upload --force
+
+#### Change config file path
+
+    $ gas upload -c path/to/configfile.json
+
+>*Note* the default config file path is `./gas-config.json`.
+
+#### Change the enviroment
+
+    $ gas upload -e test
+
+>*Note* the default enviroment is `src`.
+
+## Using gas-manager as nodejs module
 
 ### Create new Project
 ```javascript
@@ -97,7 +212,23 @@ manager.getProject('file id at google drive', function(res, gasProject){
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
+
+### v0.3.0
+* Add support command line interface.
+    * `gas download`
+    * `gas upload`
+
+### v0.2.0
+* Change interface , fit for nodejs.
+
+### v0.1.0
+* First release
+
+## Roadmap
+
+* Add supporting cli of creating new project like `gas create`
+* Add supporting cli of generating config file like `gas init`
+* Add [Grunt](http://gruntjs.com/) plugin, but it may be another repository. 
 
 ## License
 Copyright (c) 2013 Keisuke Oohashi  
