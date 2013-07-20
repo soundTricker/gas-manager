@@ -3,3 +3,4 @@ npm-debug.log
 /out/
 /tmp
 /src/test/sandbox_test.coffee
+gas.cmd
