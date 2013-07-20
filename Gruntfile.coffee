@@ -4,6 +4,7 @@ module.exports = (grunt)->
   # Project configuration.
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
+
     jshint:
       options:
         jshintrc: '.jshintrc'
@@ -90,6 +91,7 @@ module.exports = (grunt)->
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
   grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-notify'
 
   # tasks.
   grunt.registerTask 'compile', [
