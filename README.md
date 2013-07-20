@@ -50,28 +50,34 @@ config file should be like below.
       }
     }
   },
-  "src" : {
-    "code": {
-      "path" : "src/main/code.js",
-      "type" : "server_js"
-    },
-    "index.html" : {
-      "path" : "src/main/view/index.html",
-      "type" : "html"
-    },
-    "classes": {
-      "path" : "src/main/api/classes.js",
-      "type" : "server_js"
+  "src": {
+    "fileId" : "1jdu8QQcKZ5glzOaJnofi2At2Q-2PnLLKxptN0CTRVfgfz9ZIopD5sYXz",
+    "files" : {
+      "index.html" : {
+        "path" : "src/main/view/index.html.js",
+        "type" : "html"
+      },
+      "test2": {
+        "path" : "src/main/gs/test2.js",
+        "type" : "server_js"
+      },
+      "classes": {
+        "path" : "src/main/gs/api/classes.js",
+        "type" : "server_js"
+      }
     }
   },
-  "test" : {
-    "codeSpec": {
-      "path" : "src/main/codeSpec.js",
-      "type" : "server_js"
-    },
-    "classesSpec": {
-      "path" : "src/main/api/classesSpec.js",
-      "type" : "server_js"
+  "test": {
+    "fileId" : "testfileid",
+    "files" : {
+      "test2Spec": {
+        "path" : "src/test/gs/test2Spec.js",
+        "type" : "server_js"
+      },
+      "classesSpec": {
+        "path" : "src/test/gs/api/code.js",
+        "type" : "server_js"
+      }
     }
   }
 }
