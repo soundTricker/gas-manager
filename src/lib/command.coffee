@@ -127,7 +127,6 @@ exports.run = ()->
             cb(null, project)
         )
       (project,cb)->
-        console.log project.origin
         project.deploy(cb)
     ],(err, project)->
       throw err if err
