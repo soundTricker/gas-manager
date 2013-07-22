@@ -56,10 +56,10 @@ exports.run = ()->
         if !fs.existsSync path.dirname(outPath)
           fs.mkdirSync path.dirname(outPath)
 
-        tasks.push do(outPath=outPath, name=file.name)->
+        tasks.push do(outPath=outPath, file=file)->
           (cb)->
             fs.writeFile outPath, file.source, (err)->
-              cb(err, [name , outPath])
+              cb(err, [file.name , outPath])
 
       async.parallel tasks , (err, pathes)->
         throw err if err
@@ -134,7 +134,7 @@ exports.run = ()->
     )
 
   program
-    .version('0.2.0')
+    .version('0.3.1')
     .option('-f, --fileId <fileId>', "target gas project fileId")
     .option('-c, --config <path>', "config file path", "./gas-config.json")
     .option('-e, --env <env>', 'the enviroment of target sources', "src")
