@@ -142,7 +142,7 @@ exports.run = ()->
   program
     .command("download")
     .description("download google apps script file")
-    .option('-p, --path <path>' , "download base path")
+    .option('-p, --path <path>' , "download base path", process.cwd())
     .action(download)
 
   program
