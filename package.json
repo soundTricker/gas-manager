@@ -45,7 +45,7 @@
     "assert": "~0.4.9",
     "grunt-notify": "~0.2.4"
   },
-  "keywords": [],
+  "keywords": ["Google Apps Script", "CLI"],
   "dependencies": {
     "refresh-token": "0.0.1",
     "async": "~0.2.9",
