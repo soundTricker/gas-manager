@@ -242,7 +242,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Roadmap
 
-* Devide a config file to credential and setting
+* Divide a config file to credential and setting
   * The default directory of credential-config file is Userhome directory.
   * The default directory of setting-config file is project directory.
 * Add supporting cli of creating new project like `gas create`
