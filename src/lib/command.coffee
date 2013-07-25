@@ -1,142 +1,31 @@
+fs = require 'fs'
+path = require 'path'
+async = require 'async'
+Manager = require('./gas-manager').Manager
+program = require 'commander'
+util = require './commands/util'
+download = require('./commands/download-command').download
+upload = require('./commands/upload-command').upload
+
 exports.run = ()->
-  fs = require 'fs'
-  path = require 'path'
-  async = require 'async'
-  Manager = require('./gas-manager').Manager
-  program = require 'commander'
+  console.log util
+  console.log util.getUserHome()
 
-  loadConfig = (program)->
-    if !fs.existsSync program.config
-      throw new Error "#{program.config} not exist, it's given."
-
-    config = require path.resolve program.config
-
-    if !config.client_id
-      throw new Error "config file should set client_id"
-    if !config.client_secret
-      throw new Error "config file should set client_secret"
-    if !config.refresh_token
-      throw new Error "config file should set refresh_token"
-
-    return config
-
-  download = (options)->
-    console.log "Start [download]...\n"
-
-    config = loadConfig(program)
-    manager = new Manager(config)
-    fileId = program.fileId || config[program.env].fileId
-
-    if !fileId
-      throw new Error(
-        "download command is given fileId in config file or -f <fileId>"
-      )
-
-    console.log "  Getting project..."
-    manager.getProject(fileId, (err, project)->
-      throw err if err
-      console.log "  Got a [#{project.filename}] project"
-      tasks = []
-      console.log "  Creating files..."
-      for file in project.getFiles()
-
-        if file.type == "server_js"
-          ext = ".js"
-        else
-          ext = ".html"
-
-        if fileId != config[program.env]?.fileId
-          filepath = path.resolve(options.path, file.name + ext)
-        else
-          confiPath = config[program.env]?.files?[file.name]?.path
-          filepath = confiPath || path.resolve(options.path, file.name + ext)
-
-        outPath = path.resolve(filepath)
-
-        if !fs.existsSync path.dirname(outPath)
-          fs.mkdirSync path.dirname(outPath)
-
-        tasks.push do(outPath=outPath, file=file)->
-          (cb)->
-            fs.writeFile outPath, file.source, (err)->
-              cb(err, [file.name , outPath])
-
-      async.parallel tasks , (err, pathes)->
-        throw err if err
-        async.each pathes
-        ,(path, cb)->
-          console.log(
-            "      [#{path[0]}] is created to \n       >>> [#{path[1]}]"
-          )
-          cb()
-        ,(err)->
-          throw err if err
-          console.log "  Created files"
-          console.log "Done."
-    )
-
-  upload = (options)->
-    config = loadConfig(program)
-
-    if !config[program.env]?.files
-      throw new Error(
-        "There is no [#{program.env}] enviroment setting at config file"
-      )
-
-    manager = new Manager(config)
-    fileId = program.fileId || config[program.env].fileId
-
-    if !fileId
-      throw new Error(
-        "upload command is given fileId in config file or -f {fileId}"
-      )
-
+  init = ()->
     async.waterfall([
       (cb)->
-        manager.getProject fileId, cb
-      (project, response, cb)->
-        readFiles = []
-        for file in project.getFiles()
-          
-          if !config[program.env].files[file.name]
-            project.deleteFile(file.name) if options.force
-            continue
-
-          readFiles.push(
-            name : file.name
-            setting : config[program.env].files[file.name]
-          )
-
-        async.parallel(
-          readFiles.map((readFile)->
-            return (callback)->
-              fs.readFile(path.resolve(readFile.setting.path)
-                ,encoding : options.encoding
-                ,(err, source)->
-
-                  return callback(err) if err
-                  project.changeFile(readFile.name, {
-                    type : readFile.setting.type
-                    source : source
-                  })
-                  callback(null)
-              )
-          )
-          ,(err)->
-            throw err if err
-            cb(null, project)
+        program.confirm('Do you have consumer_id and consumer_secret for Google OAuth2?',(ok)->
+          process.stdin.destroy()
+          cb(null, ok)
         )
-      (project,cb)->
-        project.deploy(cb)
-    ],(err, project)->
-      throw err if err
-      console.log "Success uploading for #{project.filename}"
+    ], (err, result)-> @
     )
 
   program
     .version('0.3.1')
     .option('-f, --fileId <fileId>', "target gas project fileId")
-    .option('-c, --config <path>', "config file path", "./gas-config.json")
+    .option('-c, --config <path>', "credential config file path", "./gas-config.json")
+    .option('-s, --setting <path>', "")
     .option('-e, --env <env>', 'the enviroment of target sources', "src")
 
   program
@@ -158,5 +47,10 @@ exports.run = ()->
        server's file will be deleted"
       )
     .action(upload)
+
+  program
+    .command("init")
+    .description("generate config file.")
+    .action(init)
 
   program.parse(process.argv)

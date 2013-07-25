@@ -24,9 +24,9 @@ module.exports = (grunt)->
       gruntfile:
         src: 'Gruntfile.coffee'
       lib:
-        src: ['src/lib/*.coffee']
+        src: ['src/lib/{,*/}*.coffee']
       test:
-        src: ['src/test/*.coffee']
+        src: ['src/test/{,*/}*.coffee']
       options:
         no_trailing_whitespace:
           level: 'error'
