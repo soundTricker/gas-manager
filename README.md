@@ -225,6 +225,10 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+### v0.3.1
+* Fix critical bug.
+    * Fixed that the `gas upload` command write wrong file.
+
 ### v0.3.0
 * Add support command line interface.
     * `gas download`
@@ -238,6 +242,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Roadmap
 
+* Divide a config file to credential and setting
+  * The default directory of credential-config file is Userhome directory.
+  * The default directory of setting-config file is project directory.
 * Add supporting cli of creating new project like `gas create`
 * Add supporting cli of generating config file like `gas init`
 * Add [Grunt](http://gruntjs.com/) plugin, but it may be another repository. 
