@@ -4,3 +4,5 @@ npm-debug.log
 /tmp
 /src/test/sandbox_test.coffee
 gas.cmd
+gas-manager.sublime-project
+gas-manager.sublime-workspace
