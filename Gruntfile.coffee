@@ -5,6 +5,17 @@ module.exports = (grunt)->
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
 
+    notify_hooks:
+      options:
+        enabled : true
+        max_jshint_notifications : 5
+        title : 'Grunt Notify'
+    notify:
+      watch:
+        options:
+          title:"Watch complete"
+          message : "Complete tasks"
+
     jshint:
       options:
         jshintrc: '.jshintrc'
@@ -65,22 +76,22 @@ module.exports = (grunt)->
     watch:
       gruntfile:
         files: '<%= coffeelint.gruntfile.src %>'
-        tasks: ['coffeelint:gruntfile']
+        tasks: ['coffeelint:gruntfile','notify:watch']
       jsLib:
         files: '<%= jshint.lib.src %>'
-        tasks: ['jshint:lib']
+        tasks: ['jshint:lib','notify:watch']
       jsTest:
         files: '<%= jshint.test.src %>'
-        tasks: ['jshint:test', 'simplemocha']
+        tasks: ['jshint:test', 'simplemocha','notify:watch']
       coffee:
         files: '<%= coffeelint.lib.src %>'
-        tasks: ['coffeelint:lib','coffee:lib']
+        tasks: ['coffeelint:lib','coffee:lib','notify:watch']
       cofffeLib:
         files: '<%= coffeelint.lib.src %>'
-        tasks: ['coffeelint:lib','coffee:lib', 'simplemocha']
+        tasks: ['coffeelint:lib','coffee:lib', 'simplemocha','notify:watch']
       cofffeTest:
         files: '<%= coffeelint.test.src %>'
-        tasks: ['coffeelint:test','coffee:test', 'simplemocha']
+        tasks: ['coffeelint:test','coffee:test', 'simplemocha','notify:watch']
     clean: ['out/']
 
   # plugins.
@@ -106,3 +117,4 @@ module.exports = (grunt)->
     'simplemocha'
   ]
 
+  grunt.task.run 'notify_hooks'
