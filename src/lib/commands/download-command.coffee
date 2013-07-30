@@ -8,8 +8,13 @@ util = require './util'
 exports.download = (options)->
   program = @
   console.log "Start [download]...\n"
-
   config = util.loadConfig(program)
+
+  if options.src
+    config[program.env] = 
+      fileId : program.fileId || config[program.env].fileId
+      files : options.src
+
   manager = new Manager(config)
   fileId = program.fileId || config[program.env].fileId
 
@@ -26,6 +31,9 @@ exports.download = (options)->
     console.log "  Creating files..."
     for file in project.getFiles()
 
+      if !options.force && !config[program.env]?.files?[file.name]
+        continue
+
       if file.type == "server_js"
         ext = ".js"
       else
@@ -34,8 +42,8 @@ exports.download = (options)->
       if fileId != config[program.env]?.fileId
         filepath = path.resolve(options.path, file.name + ext)
       else
-        confiPath = config[program.env]?.files?[file.name]?.path
-        filepath = confiPath || path.resolve(options.path, file.name + ext)
+        configPath = config[program.env]?.files?[file.name]?.path
+        filepath = configPath || path.resolve(options.path, file.name + ext)
 
       outPath = path.resolve(filepath)
 

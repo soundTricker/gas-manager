@@ -11,7 +11,7 @@ exports.loadConfig = (program)->
 
   config = require path.resolve program.config
 
-  if program.setting
+  if program.setting && fs.existsSync(path.resolve(program.setting))
     setting = require path.resolve program.setting
 
     for k, v of setting
