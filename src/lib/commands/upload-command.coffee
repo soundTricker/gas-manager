@@ -22,6 +22,11 @@ exports.upload = (options)->
       "upload command is given fileId in config file or -f {fileId}"
     )
 
+  if options.src
+    config[program.env] = 
+      fileId : fileId
+      files : options.src
+
   async.waterfall([
     (cb)->
       manager.getProject fileId, cb

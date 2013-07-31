@@ -10,18 +10,19 @@ exports.download = (options)->
   console.log "Start [download]...\n"
   config = util.loadConfig(program)
 
-  if options.src
-    config[program.env] = 
-      fileId : program.fileId || config[program.env].fileId
-      files : options.src
-
   manager = new Manager(config)
   fileId = program.fileId || config[program.env].fileId
 
   if !fileId
     throw new Error(
-      "download command is given fileId in config file or -f <fileId>"
+      "download command is given fileId in setting file or -f <fileId>"
     )
+
+  if options.src
+    config[program.env] = 
+      fileId : fileId
+      files : options.src
+
 
   console.log "  Getting project..."
   manager.getProject(fileId, (err, project)->
