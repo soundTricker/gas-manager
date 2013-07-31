@@ -233,8 +233,9 @@ createProjectSettingFlow = (config, callback)->
         fs.mkdirSync path.dirname(result)
 
       setting = {}
-      setting.fileId = project.fileId
-      setting[env] = files
+      setting[env] = 
+        fileId : project.fileId
+        files : files
 
       fs.writeFileSync result, JSON.stringify(setting, "", 2)
 
