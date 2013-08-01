@@ -2,17 +2,9 @@
 
 > Google Apps Script Import/Export Helper for nodejs
 
-## Getting Started
-gas-manager requiered refresh-token of Google API.  
-Please get refresh-token with below scopes.
+## Install
 
-* https://www.googleapis.com/auth/drive
-* https://www.googleapis.com/auth/drive.file
-* https://www.googleapis.com/auth/drive.scripts
-
-If you need more detail, please refference [here](http://masashi-k.blogspot.jp/2013/07/accessing-to-my-google-drive-from-nodejs.html).
-
-then you may install this plugin with this command:
+you may install this plugin with this command:
 
 ```shell
 npm install gas-manager --save
@@ -24,23 +16,74 @@ if you need gas-manager cli, please run below command:
 npm install -g gas-manager
 ```
 
+## Getting Started
+
+gas-manager requiered refresh-token of Google API.  
+Please get refresh-token with below scopes.
+
+* https://www.googleapis.com/auth/drive
+* https://www.googleapis.com/auth/drive.file
+* https://www.googleapis.com/auth/drive.scripts
+
+gas-manager provide generator of the refresh-token.  
+Please run with this command:
+
+```shell
+gas init
+```
+
+Or if you need get it yourown, please refference [here](http://masashi-k.blogspot.jp/2013/07/accessing-to-my-google-drive-from-nodejs.html).
+
+then 
+
 ## CLI
 gas-manager support Command Line Interface.
 
-### Prepare config file.
-In order to use CLI of gas-manager, it will be necessary to create config file.  
-The config file default path is `./gas-config.json`.  
-If you need change that, please add `-c /path/to/configfile` option when running command.  
+### Prepare credential file.
+In order to use CLI of gas-manager, it will be necessary to create credential and project-setting file.  
 
-config file should be like below.
+You can create these files by running this command
 
->***Caution!*** config file inculde refresh_token, it should not publish.
+```shell
+gas init
+```
+
+#### Credential File
+
+The credential file　retain Google OAuth2 properties, thease are client id, client secret and refresh token.
+that default path is `{USER_HOME}/gas-credential.json`.  
+If you need change that, please add `-c /path/to/credentialfile` option when running command.  
+
+gas-manager need this file each your account.
+
+Then credential file should be like below.
+
+>***Caution!*** credential file inculde refresh_token, it should not publish.
 
 ```json
 {
   "client_id": "your client_id , getting from Googe API Console",
   "client_secret": "your client_secret , getting from Googe API Console",
   "refresh_token":"your refresh_token, please see the adove link",
+}
+```
+
+#### Project Setting File
+
+The project-setting file retain gas project settings, thease are source mapping between gas project and your local file, gas project fileId.  
+that default path is `./gas-project.json`.
+If you need change that, please add `-s /path/to/project-settingfile` option when running command.  
+
+If you do not need create this file, please add `-S "gas-project-filename:/path/to/yourlocalfile ..."` option like below.
+
+```shell
+gas upload -f {gas-project fileId} -S "code:./src/main/js/code.js index:./src/main/view/index.html"
+```
+
+Then credential file should be like below.
+
+```json
+{
   "enviroment name": {
     "fileId" : "target Google Drive's fileId of google apps script project",
     "files" : {
@@ -88,6 +131,17 @@ config file should be like below.
 #### Show help
     $ gas --help
 
+### Init Command
+> THe `init` command generate credential file and project-setting file with interactive interface.
+
+#### Make credential and project-setting files.
+
+    $ gas init
+
+#### Make a only project-setting file.
+
+    $ gas init -P
+
 ### Download Command
 >The `download` command is downloading GAS Project to your local.
 
@@ -97,23 +151,37 @@ config file should be like below.
 
 #### Download GAS Project to local.
 
-    $ gas download -p src/main/
+    $ gas download
 
 >***Caution!*** `gas download` command always override local sources.  
->*Note* `-p` option is default save path for downloading sources. if gas filename is not set in config, this path is used.
+>*Note* `-p` option is default save path for downloading sources. if gas filename is not set in credential, this path is used.
 
+#### Change the credential file path
 
-#### Change config file path
+    $ gas download -p src/main/ -c /path/to/credentialfile.json
 
-    $ gas download -p src/main/ -c path/to/configfile.json
+>*Note* the default credential file path is `./gas-credential.json`.
 
->*Note* the default config file path is `./gas-config.json`.
+#### Change the project file path
+
+    $ gas download -s /path/to/projectsettingfilepath
 
 #### Change the enviroment
 
-    $ gas download -p src/main/ -c path/to/configfile.json -e test
+    $ gas download -p src/main/ -c /path/to/credentialfile.json -e test
 
 >*Note* the default enviroment is `src`.
+
+#### Download files without project file
+
+    $ gas download -S "code:/path/to/localfile index:/path/to/localfile"
+
+#### Force download
+
+    $ gas download --force
+
+>*Note* the `--force` option is downloading files if a server file is not defined at the project setting file.  
+that download to current directory. if you need change this path, please use `-p /path/to/basepath` option.
 
 ### Upload Command
 
@@ -127,17 +195,21 @@ config file should be like below.
 
     $ gas upload
 
->*Note* The `upload` command upload files written in config file. if file is not exist in config file, it is not uploaded.  
+>*Note* The `upload` command upload files written in credential file. if file is not exist in credential file, it is not uploaded.  
 
-#### Upload your local files and delete GAS Project file, that does not exist in config file.
+#### Upload files without project file
+
+    $ gas upload -S "code:/path/to/localfile index:/path/to/localfile"
+
+#### Upload your local files and delete GAS Project file, that does not exist in credential file.
 
     $ gas upload --force
 
-#### Change config file path
+#### Change credential file path
 
-    $ gas upload -c path/to/configfile.json
+    $ gas upload -c path/to/credentialfile.json
 
->*Note* the default config file path is `./gas-config.json`.
+>*Note* the default credential file path is `./gas-credential.json`.
 
 #### Change the enviroment
 
@@ -225,6 +297,11 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+### v0.4.0
+* Add `init` command
+* Divide config file to credential file and project-setting file.
+* Add `--src` option for running with out project-setting file.
+
 ### v0.3.1
 * Fix critical bug.
     * Fixed that the `gas upload` command write wrong file.
@@ -242,11 +319,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Roadmap
 
-* Divide a config file to credential and setting
-  * The default directory of credential-config file is Userhome directory.
-  * The default directory of setting-config file is project directory.
+* Add supporting crypting credential file.
 * Add supporting cli of creating new project like `gas create`
-* Add supporting cli of generating config file like `gas init`
 * Add [Grunt](http://gruntjs.com/) plugin, but it may be another repository. 
 
 ## License
