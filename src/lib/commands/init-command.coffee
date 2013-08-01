@@ -1,3 +1,13 @@
+###
+
+gas-manager
+https://github.com/soundTricker/gas-manager
+
+Copyright (c) 2013 Keisuke Oohashi
+Licensed under the MIT license.
+
+###
+
 fs = require 'fs'
 path = require 'path'
 async = require 'async'
@@ -233,7 +243,7 @@ createProjectSettingFlow = (config, callback)->
         fs.mkdirSync path.dirname(result)
 
       setting = {}
-      setting[env] = 
+      setting[env] =
         fileId : project.fileId
         files : files
 
@@ -242,14 +252,15 @@ createProjectSettingFlow = (config, callback)->
       console.log "Created project setting file to #{path.resolve(result).green}"
       cb(null)
 
-  async.waterfall([
+  async.waterfall(
+    [
       start
       getProject
       confirmProject
       setEnvironment
       askWhereToCreatingFiles
       saveProjectSettingToFile
-    ],(err)->
+    ], (err)->
       if err is "restart" then return
       if err then throw err
       if callback then callback(null)

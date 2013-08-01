@@ -1,3 +1,16 @@
+###
+
+gas-manager
+https://github.com/soundTricker/gas-manager
+
+Copyright (c) 2013 Keisuke Oohashi
+Licensed under the MIT license.
+
+###
+
+'use strict'
+
+
 fs = require 'fs'
 path = require 'path'
 async = require 'async'
@@ -23,7 +36,7 @@ exports.upload = (options)->
     )
 
   if options.src
-    config[program.env] = 
+    config[program.env] =
       fileId : fileId
       files : options.src
 

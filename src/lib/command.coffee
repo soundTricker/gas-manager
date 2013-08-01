@@ -1,10 +1,21 @@
+###
+
+gas-manager
+https://github.com/soundTricker/gas-manager
+
+Copyright (c) 2013 Keisuke Oohashi
+Licensed under the MIT license.
+
+###
+
+'use strict'
+
 fs = require 'fs'
 path = require 'path'
 async = require 'async'
 Manager = require('./gas-manager').Manager
 program = require 'commander'
 util = require './commands/util'
-
 
 exports.run = ()->
 
@@ -28,14 +39,14 @@ exports.run = ()->
       ,"""\n\tThe source mapping between project file and local file.
       \tPlease set like below.
       \t  --src "code:./src/code.js index:./src/index.html"
-      \tThis option is preferred all other options and setting file. 
+      \tThis option is preferred all other options and setting file.
 
       """
       ,(value)->
         return value.split(" ").reduce((map, source)->
           m = source.split(":")
           map[m[0]] = path : m[1]
-          return map;
+          return map
         ,{})
     )
     .action(require('./commands/download-command').download)
@@ -52,7 +63,7 @@ exports.run = ()->
       ,"""\n\tThe source mapping between project file and local file.
       \tPlease set like below.
       \t  --src "code:./src/code.js index:./src/index.html"
-      \tThis option is preferred all other options and setting file. 
+      \tThis option is preferred all other options and setting file.
 
       """
       ,(value)->
@@ -61,7 +72,7 @@ exports.run = ()->
           map[m[0]] =
             path : m[1]
             type : if path.extname(m[1]) == ".html" then "html" else "server_js"
-          return map;
+          return map
         ,{})
     )
     .option(
