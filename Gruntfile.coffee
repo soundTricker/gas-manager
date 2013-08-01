@@ -42,7 +42,7 @@ module.exports = (grunt)->
         no_trailing_whitespace:
           level: 'error'
         max_line_length:
-          level: 'warn'
+          level: 'ignore'
     coffee:
       #compile:
       #  files:
