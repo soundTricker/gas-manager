@@ -8,9 +8,10 @@ fileId = "1jdu8QQcKZ5glzOaJnofi2At2Q-2PnLLKxptN0CTRVfgfz9ZIopD5sYXz"
 options = JSON.parse fs.readFileSync "./tmp/test.json"
 scriptManager = new Manager options
 should = require "should"
+assert = require "assert"
 
 describe "GASProject", ()->
-  describe "#constructor",()->
+  describe "#constructor", ()->
     project = null
     before (done)->
       scriptManager.getProject(fileId, (err, p)->
@@ -204,12 +205,19 @@ describe "GASProject", ()->
       it "should create new project, if does not have fileId", (done)->
         scriptManager.createProject("new project")
         .addFile("hoge", "server_js", "//test")
+        .addFile("index", "html", "<div>hode</div>")
         .deploy((err, newProject, res)->
           return done(err) if err
           scriptManager.getProject(newProject.fileId,(err, reget)->
             return done(err) if err
             newProject.fileId.should.eql reget.fileId
             should.exist newProject.getFileByName("hoge")
+
+            index = newProject.getFileByName("index")
+
+            should.exist index
+            index.type.should.eql "html"
+
             newProject.filename.should.eql "new project"
             scriptManager.deleteProject(newProject.fileId, ()-> done())
           )

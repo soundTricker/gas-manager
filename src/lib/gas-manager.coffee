@@ -119,7 +119,13 @@ class Manager
         accessToken_ = accessToken
         request({
           method : 'post',
-          body : JSON.stringify(gasProjectJson),
+          body : JSON.stringify(
+              files: [
+                  name : "dummy"
+                  type : "server_js"
+                  source : 'Logger.log("dummy")'
+              ]
+          ),
           headers : {
             "content-type" :"application/vnd.google-apps.script+json"
           }
@@ -129,18 +135,26 @@ class Manager
             'access_token' : accessToken
           }
         }, cb)
-      (response, body ,cb)=>
+      (response, body, cb)=>
+
         if response.statusCode != 200
-          cb(body, null, response)
+          cb("Bad status code #{response.statusCode}", body, response)
           return
         result = JSON.parse(body)
 
         if result.error
           cb(result, null,response)
           return
+        @upload(result.id, gasProjectJson, cb)
 
-        fileId = result.id
-        title = result.title
+      (project, response ,cb)=>
+
+        if response.statusCode != 200
+          cb("Bad status code #{response.statusCode}",project, response)
+          return
+
+        fileId = project.fileId
+        title = project.filename
         if filename
           request({
             method: 'put'
@@ -149,21 +163,11 @@ class Manager
             qs :
               'access_token' : accessToken_
           }, (err, res, b)->
-            if err
-              cb(err)
-              return
-
-            if res.statusCode != 200
-              cb(b, null, res)
-              return
+            return cb(err, null, res) if err
+            return cb("Bad status code #{res.statusCode}", null, res) if res.statusCode != 200
             result = b
-
-            if result.error
-              cb(result, null,res)
-              return
-
-            project = new GASProject(filename, fileId, @, gasProjectJson)
-            cb(null, project, res)
+            return cb(result, null, res) if result.error
+            cb(null, new GASProject(filename, fileId, @, gasProjectJson), res)
           )
           return
 
@@ -285,7 +289,7 @@ class Manager
         o = @origin
         Object.defineProperty(@, k,
           get : do(key=k)-> ()-> o[key]
-          set : do(key=k)-> (value)-> o[key] = value
+          set : do(key=k)-> (value)-> if o.id then console.warn "can't change type of existing file" else o[key] = value
         )
 
 exports.Manager = Manager
