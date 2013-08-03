@@ -89,6 +89,10 @@ exports.run = ()->
       '-P --only-project'
       , "Creating only a project setting file"
     )
-    .action(require('./commands/init-command').init)
+    .action require('./commands/init-command').init
+    
+  program
+    .command("logo")
+    .action require('./commands/logo-command').logo
 
   program.parse(process.argv)
