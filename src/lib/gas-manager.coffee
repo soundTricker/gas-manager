@@ -289,7 +289,7 @@ class Manager
         o = @origin
         Object.defineProperty(@, k,
           get : do(key=k)-> ()-> o[key]
-          set : do(key=k)-> (value)-> if o.id then console.warn "can't change type of existing file" else o[key] = value
+          set : do(key=k)-> (value)-> if o.id && key is "type" then console.warn "can't change type of existing file" else o[key] = value
         )
 
 exports.Manager = Manager
