@@ -22,11 +22,6 @@ exports.upload = (options)->
   program = @
   config = util.loadConfig(program)
 
-  if !config[program.env]?.files
-    throw new Error(
-      "There is no [#{program.env}] enviroment setting at config file"
-    )
-
   manager = new Manager(config)
   fileId = program.fileId || config[program.env].fileId
 
@@ -39,6 +34,11 @@ exports.upload = (options)->
     config[program.env] =
       fileId : fileId
       files : options.src
+
+  if !config[program.env]?.files
+    throw new Error(
+      "There is no [#{program.env}] enviroment setting at config file"
+    )
 
   async.waterfall([
     (cb)->

@@ -9,8 +9,7 @@ Licensed under the MIT license.
 ###
 
 exports.logo = ()->
-      console.log """
-
+  console.log """
                                                                             #{"1111".cyan}
                                                                           #{"11111111".cyan}
    __ _  __ _ ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __         #{"111111111111".cyan}
