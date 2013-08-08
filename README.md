@@ -297,6 +297,10 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+### v0.4.1
+* Bugfix release.
+    * Right now, realy not need gas-project.json, if add option -S
+
 ### v0.4.0
 * Add `init` command
 * Divide config file to credential file and project-setting file.
