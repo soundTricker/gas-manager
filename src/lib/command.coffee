@@ -16,11 +16,12 @@ async = require 'async'
 Manager = require('./gas-manager').Manager
 program = require 'commander'
 util = require './commands/util'
+pkg = require "../../package.json"
 
 exports.run = ()->
 
   program
-    .version('0.3.1')
+    .version(pkg.version)
     .option('-f, --fileId <fileId>', "target gas project fileId")
     .option('-c, --config <path>', "credential config file path", "#{path.resolve(util.getUserHome() , 'gas-config.json')}")
     .option('-s, --setting <path>', "project setting file path", "./gas-project.json")

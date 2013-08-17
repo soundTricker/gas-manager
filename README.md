@@ -297,7 +297,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
-### v0.4.1
+### v0.4.2
 * Bugfix release.
     * Right now, realy not need gas-project.json, if add option -S
 
