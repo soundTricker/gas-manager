@@ -43,7 +43,7 @@ class Manager
     async.waterfall([
       (cb)=>
           @tokenProvider.getToken(cb)
-      ,(accessToken, cb)=>
+      ,(accessToken, cb)->
         request.get({
           url : Manager.DOWNLOAD_URL + fileId,
           qs :{
@@ -85,7 +85,7 @@ class Manager
     async.waterfall([
       (cb)=>
         @tokenProvider.getToken(cb)
-      (accessToken, cb)=>
+      (accessToken, cb)->
         request({
           method: 'delete',
           url : "#{API_ROOT}/files/#{fileId}"
@@ -93,7 +93,7 @@ class Manager
             'access_token' : accessToken
           }
         }, cb)
-      (response, body, cb)=>
+      (response, body, cb)->
         if response.statusCode != 200
           cb(body, null,response)
           return
@@ -185,7 +185,7 @@ class Manager
     async.waterfall([
       (cb)=>
           @tokenProvider.getToken(cb)
-      (accessToken, cb)=>
+      (accessToken, cb)->
         request({
           method : 'put',
           body : JSON.stringify(gasProjectJson),
