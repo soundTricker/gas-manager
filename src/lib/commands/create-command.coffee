@@ -33,7 +33,7 @@ exports.create = (options)->
       "There is no [#{program.env}] enviroment setting at config file"
     )
 
-  project = manager.createProject program.env
+  project = manager.createProject program.env, config[program.env].folderId
   async.waterfall([
     (cb)->
       async.parallel(

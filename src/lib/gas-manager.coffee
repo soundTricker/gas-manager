@@ -65,15 +65,15 @@ class Manager
           response.headers["content-disposition"]
           .split("''")[1].replace(/\.json$/,"")
         )
-        project = new GASProject(filename, fileId, @, JSON.parse(body))
+        project = new GASProject(filename, fileId, null, @, JSON.parse(body))
         cb(null
           ,project
           ,response)
     ]
     ,callback)
 
-  createProject:(projectName)->
-    return new GASProject projectName , null, @, {files : []}
+  createProject:(projectName, folderId)->
+    return new GASProject projectName , null, folderId, @, {files : []}
 
   deleteProject:(fileId, callback)->
     callback = callback || (err, results)->
@@ -107,7 +107,7 @@ class Manager
     ], callback)
 
 
-  createNewProject : (filename, gasProjectJson, callback)=>
+  createNewProject : (filename, folderId, gasProjectJson, callback)=>
     callback = callback || (err, results)->
       if err then console.log(err,results)
 
@@ -145,7 +145,13 @@ class Manager
         if result.error
           cb(result, null,response)
           return
-        @upload(result.id, gasProjectJson, cb)
+        if folderId
+          @move(result.id, result.parents[0].id, folderId, cb)
+          return
+        cb(null, result.id)
+
+      (fileId, cb)=>
+        @upload(fileId, gasProjectJson, cb)
 
       (project, response ,cb)=>
 
@@ -167,12 +173,49 @@ class Manager
             return cb("Bad status code #{res.statusCode}", null, res) if res.statusCode != 200
             result = b
             return cb(result, null, res) if result.error
-            cb(null, new GASProject(filename, fileId, @, gasProjectJson), res)
+            cb(null, new GASProject(filename, fileId, null, @, gasProjectJson), res)
           )
           return
 
-        cb(null, new GASProject(title, fileId, @,gasProjectJson), response)
+        cb(null, new GASProject(title, fileId, null, @,gasProjectJson), response)
     ],callback)
+
+  move:(fileId, fromFolderId, toFolderId, callback)->
+
+    callback = callback || (err, results)->
+      if err then console.log(err,results)
+
+    if !fileId
+      throw new Error 'fileId id is given'
+
+    async.waterfall([
+      (cb)=>
+        @tokenProvider.getToken(cb)
+      (accessToken, cb)->
+        request({
+          method : 'post',
+          json : {id: toFolderId}
+          url : "#{API_ROOT}/files/#{fileId}/parents",
+          qs :{
+            'access_token' : accessToken
+          }
+        }, (err, response, body)->
+          cb(null, accessToken, response, body)
+        )
+      (accessToken, response, body ,cb)->
+        if response.statusCode != 200
+          cb(body, null, response)
+          return
+        request({
+          method : 'delete',
+          url : "#{API_ROOT}/files/#{fileId}/parents/#{fromFolderId}",
+          qs :{
+            'access_token' : accessToken
+          }
+        }, (response, body)->
+          cb(null, fileId)
+        )
+    ], callback)
 
   upload:(fileId, gasProjectJson, callback)=>
 
@@ -208,12 +251,12 @@ class Manager
           return
 
         {id, title} = JSON.parse(body)
-        cb(null, new GASProject(title, id, @, gasProjectJson), response)
+        cb(null, new GASProject(title, id, null, @, gasProjectJson), response)
     ]
     ,callback)
 
   class GASProject
-    constructor:(@filename, @fileId, @manager, @origin={files:[]})->
+    constructor:(@filename, @fileId, @folderId, @manager, @origin={files:[]})->
       if !@origin.files then @origin.files = []
 
     getFiles:()->
@@ -276,12 +319,12 @@ class Manager
       if @fileId
         @manager.upload(@fileId, @origin, callback)
       else
-        @manager.createNewProject(@filename, @origin, callback)
+        @manager.createNewProject(@filename, @folderId, @origin, callback)
         
     create:(callback)=>
       newProject = JSON.parse(JSON.stringify(@origin))
       delete file.id for k, file in newProject.files when file.id
-      @manager.createNewProject(@filename, @origin, callback)
+      @manager.createNewProject(@filename, @folderId, @origin, callback)
           
   class GASFile
     constructor:(@manager, @origin)->
