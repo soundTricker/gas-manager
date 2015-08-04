@@ -78,8 +78,10 @@ exports.run = ()->
     )
     .option(
       '-F, --force'
-      ,"If does not exist source in config.json but exist on server,
-       server's file will be deleted"
+      ,"If does not exist source in gas-project.json but exist on server,
+       server's file will be deleted.
+       And if does not exist source on server but in gas-project.json,
+       upload the new file to server"
       )
     .action(require('./commands/upload-command').upload)
 
