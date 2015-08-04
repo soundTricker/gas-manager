@@ -84,6 +84,32 @@ exports.run = ()->
     .action(require('./commands/upload-command').upload)
 
   program
+    .command("create")
+    .description("create a new google apps script project")
+    .option(
+      '-e, --encoding <encoding>'
+      ,"The encoding of reading file", "UTF-8"
+    )
+    .option(
+      '-S, --src "<to:from...>"'
+      ,"""\n\tThe source mapping between project file and local file.
+      \tPlease set like below.
+      \t  --src "code:./src/code.js index:./src/index.html"
+      \tThis option is preferred all other options and setting file.
+
+      """
+      ,(value)->
+        return value.split(" ").reduce((map, source)->
+          m = source.split(":")
+          map[m[0]] =
+            path : m[1]
+            type : if path.extname(m[1]) == ".html" then "html" else "server_js"
+          return map
+        ,{})
+    )
+    .action(require('./commands/create-command').create)
+
+  program
     .command("init")
     .description("generate config file.")
     .option(
