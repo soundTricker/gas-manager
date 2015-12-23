@@ -44,33 +44,51 @@ exports.upload = (options)->
     (cb)->
       manager.getProject fileId, cb
     (project, response, cb)->
-      readFiles = []
+      readFiles = {}
       for file in project.getFiles()
         
         if !config[program.env].files[file.name]
           project.deleteFile(file.name) if options.force
           continue
 
-        readFiles.push(
+        readFiles[file.name] =
           name : file.name
           setting : config[program.env].files[file.name]
-        )
+          exist : yes
+
+      if options.force
+        for name,file of config[program.env].files
+          if !readFiles[name]
+            readFiles[name] =
+              name : name
+              setting : file
+              exist : no
 
       async.parallel(
-        readFiles.map((readFile)->
-          return (callback)->
-            fs.readFile(path.resolve(readFile.setting.path)
-              ,encoding : options.encoding
-              ,(err, source)->
-
-                return callback(err) if err
-                project.changeFile(readFile.name, {
-                  type : readFile.setting.type
-                  source : source
-                })
-                callback(null)
+        do (tasks = []) ->
+          for name,readFile of readFiles
+            tasks.push(
+              do (file = readFile) ->
+                (callback)->
+                  fs.readFile(path.resolve(file.setting.path)
+                    ,encoding : options.encoding
+                    ,(err, source)->
+  
+                      return callback(err) if err
+                      if file.exist
+                        project.changeFile(name, {
+                          type : file.setting.type
+                          source : source
+                        })
+                      else
+                        project.addFile(name, {
+                          type : file.setting.type
+                          source : source
+                        })
+                      callback(null)
+                  )
             )
-        )
+          tasks
         ,(err)->
           throw err if err
           cb(null, project)
