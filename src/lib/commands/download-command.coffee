@@ -44,9 +44,10 @@ exports.download = (options)->
 
       if !options.force && !config[program.env]?.files?[file.name]
         continue
-
       if file.type == "server_js"
         ext = ".js"
+      else if file.type == "json"
+        ext = ".json"
       else
         ext = ".html"
 
