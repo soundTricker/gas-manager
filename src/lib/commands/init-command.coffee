@@ -201,7 +201,12 @@ createProjectSettingFlow = (config, callback)->
   askWhereToCreatingFiles = (project, env, cb)->
     savedfiles = {}
     askWhereToCreatingFile = (file, files, basePath, cb2)->
-      extension = if file.type == "server_js" then ".js" else ".html"
+      if file.type == "server_js"
+        extension = ".js"
+      else if file.type == "json"
+        extension = ".json"
+      else
+        extension = ".html"
       filename = file.name + extension
       program.prompt("  > #{filename} #{('[Default: ' + path.resolve(basePath, filename) + ']').green}: ", (result)->
         if !result

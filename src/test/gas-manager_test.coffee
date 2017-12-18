@@ -169,7 +169,7 @@ describe 'gas-manager', ()->
         scriptManager = new Manager options
         @
       it "should create new gas project",(done)->
-        scriptManager.createNewProject "test-test" , {
+        scriptManager.createNewProject "test-test" , null, {
           files :[
             {
               name : "test"
@@ -185,6 +185,7 @@ describe 'gas-manager', ()->
           done()
         @
       after (done)->
+        return done() if !fileId
         scriptManager.deleteProject(fileId
           ,(err)->
             return done(err) if err
