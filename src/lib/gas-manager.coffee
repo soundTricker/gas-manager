@@ -47,7 +47,8 @@ class Manager
         request.get({
           url : Manager.DOWNLOAD_URL + fileId,
           qs :{
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, cb)
       ,(response, body, cb)=>
@@ -90,7 +91,8 @@ class Manager
           method: 'delete',
           url : "#{API_ROOT}/files/#{fileId}"
           qs : {
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, cb)
       (response, body, cb)->
@@ -132,7 +134,8 @@ class Manager
           url : "#{UPLOAD_API_ROOT}/files",
           qs :{
             'convert' : true
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, cb)
       (response, body, cb)=>
@@ -167,7 +170,8 @@ class Manager
             json : {title:filename}
             url : "#{API_ROOT}/files/#{fileId}"
             qs :
-              'access_token' : accessToken_
+              'access_token' : accessToken_,
+              'supportsTeamDrives': true
           }, (err, res, b)->
             return cb(err, null, res) if err
             return cb("Bad status code #{res.statusCode}", null, res) if res.statusCode != 200
@@ -197,7 +201,8 @@ class Manager
           json : {id: toFolderId}
           url : "#{API_ROOT}/files/#{fileId}/parents",
           qs :{
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, (err, response, body)->
           cb(null, accessToken, response, body)
@@ -210,7 +215,8 @@ class Manager
           method : 'delete',
           url : "#{API_ROOT}/files/#{fileId}/parents/#{fromFolderId}",
           qs :{
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, (response, body)->
           cb(null, fileId)
@@ -237,7 +243,8 @@ class Manager
           }
           url : "#{UPLOAD_API_ROOT}/files/#{fileId}",
           qs :{
-            'access_token' : accessToken
+            'access_token' : accessToken,
+            'supportsTeamDrives': true
           }
         }, cb)
       (response, body ,cb)=>
