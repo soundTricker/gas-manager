@@ -1,7 +1,7 @@
 {
   "name": "gas-manager",
   "description": "Google Apps Script Import/Export Helper for nodejs",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "homepage": "https://github.com/soundTricker/gas-manager",
   "author": {
     "name": "Keisuke Oohashi",
