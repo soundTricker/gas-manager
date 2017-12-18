@@ -142,9 +142,9 @@ describe "GASProject", ()->
         should.not.exist project.getFileByName("test")
         changedFile = project.getFileByName("huga")
         should.exist changedFile
-        changedFile.name.should.eql "huga" 
-        changedFile.type.should.eql "html" 
-        changedFile.source.should.eql "//test2" 
+        changedFile.name.should.eql "huga"
+        changedFile.type.should.eql "html"
+        changedFile.source.should.eql "//test2"
         p.should.equal project
         @
 
@@ -155,9 +155,9 @@ describe "GASProject", ()->
 
         changedFile = project.getFileByName("test")
         should.exist changedFile
-        changedFile.name.should.eql file.name 
+        changedFile.name.should.eql file.name
         changedFile.type.should.eql file.type
-        changedFile.source.should.eql "//test2" 
+        changedFile.source.should.eql "//test2"
         @
 
       it "should allow functional parameter", ()->
@@ -167,9 +167,9 @@ describe "GASProject", ()->
 
         changedFile = project.getFileByName("test")
         should.exist changedFile
-        changedFile.name.should.eql file.name 
+        changedFile.name.should.eql file.name
         changedFile.type.should.eql file.type
-        changedFile.source.should.eql file.source + "//test2" 
+        changedFile.source.should.eql file.source + "//test2"
         @
 
 
